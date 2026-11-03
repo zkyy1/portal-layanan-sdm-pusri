@@ -1,0 +1,6 @@
+{
+    "require": {
+        "aws/aws-sdk-php": "^3.393",
+        "jumbojett/openid-connect-php": "^1.0"
+    }
+}

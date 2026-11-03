@@ -1,0 +1,149 @@
+# ============================================================
+# PORTAL PUSRI - APACHE SECURITY
+# ============================================================
+
+
+# ------------------------------------------------------------
+# 1. MATIKAN DIRECTORY LISTING
+# ------------------------------------------------------------
+#
+# Mencegah pengguna melihat daftar isi folder jika tidak ada
+# file index.php / index.html.
+#
+
+Options -Indexes
+
+
+# ------------------------------------------------------------
+# 2. AKTIFKAN REWRITE ENGINE
+# ------------------------------------------------------------
+
+RewriteEngine On
+
+
+# ------------------------------------------------------------
+# 3. BLOK AKSES LANGSUNG KE FOLDER INTERNAL
+# ------------------------------------------------------------
+#
+# Folder-folder berikut tetap dapat digunakan oleh PHP melalui:
+#
+# require
+# require_once
+# include
+# include_once
+#
+# Tetapi tidak dapat dibuka langsung melalui browser.
+#
+
+RewriteRule ^config(?:/|$) - [F,L,NC]
+RewriteRule ^includes(?:/|$) - [F,L,NC]
+RewriteRule ^vendor(?:/|$) - [F,L,NC]
+
+
+# ------------------------------------------------------------
+# 4. BLOK FILE COMPOSER
+# ------------------------------------------------------------
+
+<FilesMatch "^(composer\.json|composer\.lock)$">
+    Require all denied
+</FilesMatch>
+
+
+# ------------------------------------------------------------
+# 5. BLOK FILE TERSEMBUNYI
+# ------------------------------------------------------------
+#
+# Contoh file yang akan diblok:
+#
+# .env
+# .git
+# .htpasswd
+# .htaccess
+#
+# File .htaccess sendiri tetap digunakan Apache,
+# tetapi tidak dapat dibaca melalui browser.
+#
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+
+# ------------------------------------------------------------
+# 6. BLOK FILE BACKUP DAN FILE SENSITIF
+# ------------------------------------------------------------
+#
+# Contoh:
+#
+# database.sql
+# config.ini
+# error.log
+# file.bak
+# file.old
+# file.orig
+#
+
+<FilesMatch "\.(bak|backup|old|orig|save|swp|sql|ini|log)$">
+    Require all denied
+</FilesMatch>
+
+
+# ------------------------------------------------------------
+# 7. PHP ERROR HANDLING
+# ------------------------------------------------------------
+#
+# Error PHP tidak ditampilkan kepada pengguna/browser.
+#
+# Ini mencegah bocornya informasi seperti:
+#
+# C:\xampp\htdocs\portal-pusri\...
+# Stack trace
+# Query SQL
+# Nama file internal
+#
+# Error tetap disimpan ke log.
+#
+
+php_flag display_errors Off
+php_flag display_startup_errors Off
+
+php_flag log_errors On
+
+php_value error_reporting 32767
+
+
+# ------------------------------------------------------------
+# 8. LOKASI PHP ERROR LOG
+# ------------------------------------------------------------
+#
+# Log disimpan DI LUAR htdocs.
+#
+
+php_value error_log "C:/xampp/secure/portal-pusri-php-error.log"
+
+
+# ------------------------------------------------------------
+# 9. SESSION / CACHE PROTECTION
+# ------------------------------------------------------------
+#
+# Mencegah halaman dinamis tersimpan sembarangan oleh browser
+# atau proxy.
+#
+
+<IfModule mod_headers.c>
+
+    Header always set Cache-Control "no-store, no-cache, must-revalidate"
+    Header always set Pragma "no-cache"
+    Header always set Expires "0"
+
+</IfModule>
+
+
+# ------------------------------------------------------------
+# 10. MATIKAN SERVER SIGNATURE
+# ------------------------------------------------------------
+#
+# Mengurangi informasi versi server pada halaman error Apache.
+#
+
+ServerSignature Off

@@ -1,0 +1,12 @@
+# Kredensial asli (dikirim terpisah, jangan di-commit)
+secure/portal-pusri-secrets.php
+portal-pusri/secure/
+
+# Dependency Composer (dipasang dengan: composer install)
+portal-pusri/vendor/
+
+# Log dan file sementara
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
